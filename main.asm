@@ -147,28 +147,33 @@ BounceOnPaddle:
 	JP nz, BounceOnTop
 	
 	LD a, [_OAMRAM] ; load paddle y
-	SUB a, 16 + 6 ; 2 to offset the paddle's thickness
-				  ; and the sprite's height
+	SUB a, 16 + 6 ; 6 to offset the paddle's thickness
+		      ; and the sprite's height
 	LD b, a
 	LD a, [_OAMRAM + 4] ; load ball y
 	SUB a, 16 + 1 ; position ahead of the ball
 	CP a, b
 	JP nz, BounceOnTop
 	
-	LD a, 7
-	LD c, a
+	LD a, 7 ; prelare loop to check paddle
+	LD c, a ; width coordinates
 	LD a, 0
-	LD d, a
+	LD d, a ; forgot what d was
+	LD e, a ; 'bool' to set bounce or not
 PaddleJump:
 	LD a, [_OAMRAM + 1] ; load paddle x
-	SUB a, c
-	SUB a, 8
+	SUB a, c ; going over each position
+	SUB a, 8 ; offsetting
 	LD b, a
 	LD a, [_OAMRAM + 5] ; load ball x
+	CP a, b
+	JP z, SetPaddleJump ; jump over next part, if collision
 	DEC c
 	LD a, 0
 	CP a, c
 	JP nz, PaddleJump
+	JP BounceOnTop ; if no collision detected
+SetPaddleJump:
 	LD a, -1
 	LD [wBallMomentumY], a
 
@@ -179,7 +184,7 @@ BounceOnTop:
 	LD a, [_OAMRAM + 5]
 	SUB a, 8
 	LD b, a
-	CALL GetTileByPixel ; Returns tile address in hl
+	CALL GetTileByPixel ; Ret tile address in hl
 	LD a, [hl]
 	CALL IsWallTile
 	JP nz, BounceOnRight
