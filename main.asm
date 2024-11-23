@@ -61,25 +61,25 @@ ClearOam:
 	LD [hli], a
 	LD [hli], a
 	
-    ; Initialize the paddle sprite in OAM
-    LD hl, _OAMRAM
-    LD a, 128 + 16
-    LD [hli], a
-    LD a, 16 + 8
-    LD [hli], a
-    LD a, 0
-    LD [hli], a
-    LD [hli], a
+	; Initialize the paddle sprite in OAM
+	LD hl, _OAMRAM
+	LD a, 128 + 16
+	LD [hli], a
+	LD a, 16 + 8
+	LD [hli], a
+	LD a, 0
+	LD [hli], a
+	LD [hli], a
 	
-    ; Now initialize the ball sprite
-    LD a, 100 + 16
-    LD [hli], a
-    LD a, 32 + 8
-    LD [hli], a
-    LD a, 1
-    LD [hli], a
-    LD a, 0
-    LD [hli], a
+	; Now initialize the ball sprite
+	LD a, 100 + 16
+	LD [hli], a
+	LD a, 32 + 8
+	LD [hli], a
+	LD a, 1
+	LD [hli], a
+	LD a, 0
+	LD [hli], a
 	; Initialize ball variables
 	LD a, 1
 	LD [wBallMomentumX], a
@@ -117,22 +117,22 @@ WaitVBlank2:
 	CALL UpdateKeys
 	
 	; Ball go zoom
-    LD a, [wBallMomentumX]
-    LD b, a
-    LD a, [_OAMRAM + 5]
-    ADD a, b
-    LD [_OAMRAM + 5], a
+	LD a, [wBallMomentumX]
+	LD b, a
+	LD a, [_OAMRAM + 5]
+	ADD a, b
+	LD [_OAMRAM + 5], a
 
-    LD a, [wBallMomentumY]
-    LD b, a
-    LD a, [_OAMRAM + 4]
-    ADD a, b
-    LD [_OAMRAM + 4], a
+	LD a, [wBallMomentumY]
+	LD b, a
+	LD a, [_OAMRAM + 4]
+	ADD a, b
+	LD [_OAMRAM + 4], a
 
 BounceOnPaddle:
-    ; Remember to offset the OAM position!
-    ; (8, 16) in OAM coordinates is (0, 0) on the screen. + 8 for X and + 16 for Y
-    ; +- 1 on x or y to know the position ahead of the ball
+	; Remember to offset the OAM position!
+	; (8, 16) in OAM coordinates is (0, 0) on the screen. + 8 for X and + 16 for Y
+	; +- 1 on x or y to know the position ahead of the ball
 	
 	; i gotta check several coordinates at which the ball could be
 	; a loop to check the coords from left to right or something
@@ -174,59 +174,59 @@ PaddleJump:
 
 BounceOnTop:
 	LD a, [_OAMRAM + 4]
-    SUB a, 16 + 1
-    LD c, a
-    LD a, [_OAMRAM + 5]
-    SUB a, 8
-    LD b, a
-    CALL GetTileByPixel ; Returns tile address in hl
-    LD a, [hl]
-    CALL IsWallTile
-    JP nz, BounceOnRight
-    LD a, 1
-    LD [wBallMomentumY], a
+	SUB a, 16 + 1
+	LD c, a
+	LD a, [_OAMRAM + 5]
+	SUB a, 8
+	LD b, a
+	CALL GetTileByPixel ; Returns tile address in hl
+	LD a, [hl]
+	CALL IsWallTile
+	JP nz, BounceOnRight
+	LD a, 1
+	LD [wBallMomentumY], a
 
 BounceOnRight:
-    LD a, [_OAMRAM + 4]
-    SUB a, 16
-    LD c, a
-    LD a, [_OAMRAM + 5]
-    SUB a, 8 - 1
-    LD b, a
-    CALL GetTileByPixel
-    LD a, [hl]
-    CALL IsWallTile
-    JP nz, BounceOnLeft
-    LD a, -1
-    LD [wBallMomentumX], a
+	LD a, [_OAMRAM + 4]
+	SUB a, 16
+	LD c, a
+	LD a, [_OAMRAM + 5]
+	SUB a, 8 - 1
+	LD b, a
+	CALL GetTileByPixel
+	LD a, [hl]
+	CALL IsWallTile
+	JP nz, BounceOnLeft
+	LD a, -1
+	LD [wBallMomentumX], a
 
 BounceOnLeft:
-    LD a, [_OAMRAM + 4]
-    SUB a, 16
-    LD c, a
-    LD a, [_OAMRAM + 5]
-    SUB a, 8 + 1
-    LD b, a
-    CALL GetTileByPixel
-    LD a, [hl]
-    CALL IsWallTile
-    JP nz, BounceOnBottom
-    LD a, 1
-    LD [wBallMomentumX], a
+	LD a, [_OAMRAM + 4]
+	SUB a, 16
+	LD c, a
+	LD a, [_OAMRAM + 5]
+	SUB a, 8 + 1
+	LD b, a
+	CALL GetTileByPixel
+	LD a, [hl]
+	CALL IsWallTile
+	JP nz, BounceOnBottom
+	LD a, 1
+	LD [wBallMomentumX], a
 
 BounceOnBottom:
-    LD a, [_OAMRAM + 4]
-    SUB a, 16 - 1
-    LD c, a
-    LD a, [_OAMRAM + 5]
-    SUB a, 8
-    LD b, a
-    CALL GetTileByPixel
-    LD a, [hl]
-    CALL IsWallTile
-    JP nz, BounceDone
-    LD a, -1
-    LD [wBallMomentumY], a
+	LD a, [_OAMRAM + 4]
+	SUB a, 16 - 1
+	LD c, a
+	LD a, [_OAMRAM + 5]
+	SUB a, 8
+	LD b, a
+	CALL GetTileByPixel
+	LD a, [hl]
+	CALL IsWallTile
+	JP nz, BounceDone
+	LD a, -1
+	LD [wBallMomentumY], a
 BounceDone:
 
 	; First, check if left
@@ -262,14 +262,14 @@ Right:
 ; @param hl: Destination
 ; @param bc: Length
 Memcopy:
-    LD a, [de]
-    LD [hli], a
-    INC de
-    DEC bc
-    LD a, b
-    OR a, c
-    JP nz, Memcopy
-    RET
+	LD a, [de]
+	LD [hli], a
+	INC de
+	DEC bc
+	LD a, b
+	OR a, c
+	JP nz, Memcopy
+	RET
 
 ; Read input AND write it to variables
 ; No outside src or dest
@@ -300,14 +300,14 @@ UpdateKeys:
 	RET
 
 .onenibble
-    LDH [rP1], a ; switch the key matrix
-    CALL .knownret ; burn 10 cycles CALLing a known ret
-    LDH a, [rP1] ; ignore value while waiting for the key matrix to settle
-    LDH a, [rP1]
-    LDH a, [rP1] ; this read counts
-    OR a, $F0 ; A7-4 = 1; A3-0 = unpressed keys
+	LDH [rP1], a ; switch the key matrix
+	CALL .knownret ; burn 10 cycles CALLing a known ret
+	LDH a, [rP1] ; ignore value while waiting for the key matrix to settle
+	LDH a, [rP1]
+	LDH a, [rP1] ; this read counts
+	OR a, $F0 ; A7-4 = 1; A3-0 = unpressed keys
 .knownret
-    RET ; This return works for burning cycles AND
+	RET ; This return works for burning cycles AND
 		; it also works as the return for .onenibble
 
 ; Convert a pixel position to a tilemap address
@@ -316,49 +316,49 @@ UpdateKeys:
 ; @param c: Y
 ; @return hl: tile address
 GetTileByPixel:
-    ; First, we need to divide by 8 to convert a pixel position to a tile position.
-    ; After this we want to multiply the Y position by 32.
-    ; These operations effectively cancel out so we only need to mask the Y value.
-    LD a, c
-    AND a, %11111000
-    LD l, a
-    LD h, 0
-    ; Now we have the position * 8 in hl
-    ADD hl, hl ; position * 16
-    ADD hl, hl ; position * 32
-    ; Convert the X position to an offset.
-    LD a, b
-    SRL a ; a / 2
-    SRL a ; a / 4
-    SRL a ; a / 8
-    ; Add the two offsets together.
-    ADD a, l
-    LD l, a
-    ADC a, h
-    SUB a, l
-    LD h, a
-    ; Add the offset to the tilemap's base address, and we are done!
-    LD bc, $9800
-    ADD hl, bc
-    RET
+	; First, we need to divide by 8 to convert a pixel position to a tile position.
+	; After this we want to multiply the Y position by 32.
+	; These operations effectively cancel out so we only need to mask the Y value.
+	LD a, c
+	AND a, %11111000
+	LD l, a
+	LD h, 0
+	; Now we have the position * 8 in hl
+	ADD hl, hl ; position * 16
+	ADD hl, hl ; position * 32
+	; Convert the X position to an offset.
+	LD a, b
+	SRL a ; a / 2
+	SRL a ; a / 4
+	SRL a ; a / 8
+	; Add the two offsets together.
+	ADD a, l
+	LD l, a
+	ADC a, h
+	SUB a, l
+	LD h, a
+	; Add the offset to the tilemap's base address, and we are done!
+	LD bc, $9800
+	ADD hl, bc
+	RET
 
 ; @param a: tile ID
 ; @return z: set if a is a wall.
 IsWallTile:
-    CP a, $00
-    RET z
-    CP a, $01
-    RET z
-    CP a, $02
-    RET z
-    CP a, $04
-    RET z
-    CP a, $05
-    RET z
-    CP a, $06
-    RET z
-    CP a, $07
-    RET
+	CP a, $00
+	RET z
+	CP a, $01
+	RET z
+	CP a, $02
+	RET z
+	CP a, $04
+	RET z
+	CP a, $05
+	RET z
+	CP a, $06
+	RET z
+	CP a, $07
+	RET
 
 
 SECTION "Tile data", ROM0
@@ -595,28 +595,28 @@ TilesEnd:
 SECTION "Paddle", ROM0
 
 Paddle:
-    dw `13333331
-    dw `30000003
-    dw `13333331
-    dw `00000000
-    dw `00000000
-    dw `00000000
-    dw `00000000
-    dw `00000000
+	dw `13333331
+	dw `30000003
+	dw `13333331
+	dw `00000000
+	dw `00000000
+	dw `00000000
+	dw `00000000
+	dw `00000000
 PaddleEnd:
 
 
 SECTION "Ball", ROM0
 
 Ball:
-    dw `00033000
-    dw `00322300
-    dw `03222230
-    dw `03222230
-    dw `00322300
-    dw `00033000
-    dw `00000000
-    dw `00000000
+	dw `00033000
+	dw `00322300
+	dw `03222230
+	dw `03222230
+	dw `00322300
+	dw `00033000
+	dw `00000000
+	dw `00000000
 BallEnd:
 
 
