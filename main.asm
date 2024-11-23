@@ -139,12 +139,11 @@ BounceOnPaddle:
 	; and then check if the ball is ABOVE those coords and would collide on the next frame
 	
 	; check if the ball is going down to jump the rest if not
-	LD a, [wBallMomentumY]
-	LD a, [wBallMomentumY]
-	LD b, a
-	LD a, 1
-	CP a, b
-	JP nz, BounceOnTop
+;	LD a, [wBallMomentumY]
+;	LD b, a
+;	LD a, 1
+;	CP a, b
+;	JP nz, BounceOnTop
 	
 	LD a, [_OAMRAM] ; load paddle y
 	SUB a, 16 + 6 ; 6 to offset the paddle's thickness
@@ -154,7 +153,13 @@ BounceOnPaddle:
 	SUB a, 16 + 1 ; position ahead of the ball
 	CP a, b
 	JP nz, BounceOnTop
+	JP SetPaddleJump
 	
+
+	; ok, don't make a loop, but write each
+	; instruction separately
+	; afterwards make a function or a loop
+	; or both
 	LD a, 7 ; prelare loop to check paddle
 	LD c, a ; width coordinates
 	LD a, 0
