@@ -156,12 +156,19 @@ BounceOnPaddle:
 	JP nz, BounceOnTop
 	
 	LD a, 7
-	LD e, a
+	LD c, a
+	LD a, 0
+	LD d, a
+PaddleJump:
 	LD a, [_OAMRAM + 1] ; load paddle x
+	SUB a, c
+	SUB a, 8
 	LD b, a
 	LD a, [_OAMRAM + 5] ; load ball x
-	CP a, b
-	JP nz, BounceOnTop
+	DEC c
+	LD a, 0
+	CP a, c
+	JP nz, PaddleJump
 	LD a, -1
 	LD [wBallMomentumY], a
 
