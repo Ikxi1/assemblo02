@@ -164,8 +164,8 @@ BounceOnPaddle:
 	LD c, a ; width coordinates
 PaddleJump:
 	LD a, [_OAMRAM + 1] ; load paddle x
-	SUB a, c ; going over each position
-	ADD a, 4 ; offsetting
+	ADD a, c ; going over each position
+	; ADD a, 4 ; offsetting
 	LD b, a
 	LD a, [_OAMRAM + 5] ; load ball x
 	CP a, b
