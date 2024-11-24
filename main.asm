@@ -153,7 +153,7 @@ BounceOnPaddle:
 	SUB a, 16 + 1 ; position ahead of the ball
 	CP a, b
 	JP nz, BounceOnTop
-	JP SetPaddleJump
+	; JP SetPaddleJump
 	
 
 	; ok, don't make a loop, but write each
@@ -162,17 +162,14 @@ BounceOnPaddle:
 	; or both
 	LD a, 7 ; prelare loop to check paddle
 	LD c, a ; width coordinates
-	LD a, 0
-	LD d, a ; forgot what d was
-	LD e, a ; 'bool' to set bounce or not
 PaddleJump:
 	LD a, [_OAMRAM + 1] ; load paddle x
 	SUB a, c ; going over each position
-	SUB a, 8 ; offsetting
+	ADD a, 4 ; offsetting
 	LD b, a
 	LD a, [_OAMRAM + 5] ; load ball x
 	CP a, b
-	JP z, SetPaddleJump ; jump over next part, if collision
+	JP z, SetPaddleJump ; break loop if collision
 	DEC c
 	LD a, 0
 	CP a, c
