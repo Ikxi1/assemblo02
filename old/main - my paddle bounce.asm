@@ -129,28 +129,55 @@ WaitVBlank2:
 	ADD a, b
 	LD [_OAMRAM + 4], a
 
-PaddleBounce:
-    ; First, check if the ball is low enough to bounce off the paddle.
-    ld a, [_OAMRAM]
-    ld b, a
-    ld a, [_OAMRAM + 4]
-	ADD a, 5
-    cp a, b
-    jp nz, PaddleBounceDone ; If the ball isn't at the same Y position as the paddle, it can't bounce.
-    ; Now let's compare the X positions of the objects to see if they're touching.
-    ld a, [_OAMRAM + 5] ; Ball's X position.
-    ld b, a
-    ld a, [_OAMRAM + 1] ; Paddle's X position.
-    sub a, 8
-    cp a, b
-    jp nc, PaddleBounceDone
-    add a, 4 + 12 ; 8 to undo, 16 as the width.
-    cp a, b
-    jp c, PaddleBounceDone
+BounceOnPaddle:
+	; Remember to offset the OAM position!
+	; (8, 16) in OAM coordinates is (0, 0) on the screen. + 8 for X and + 16 for Y
+	; +- 1 on x or y to know the position ahead of the ball
+	
+	; i gotta check several coordinates at which the ball could be
+	; a loop to check the coords from left to right or something
+	; and then check if the ball is ABOVE those coords and would collide on the next frame
+	
+	; check if the ball is going down to jump the rest if not
+;	LD a, [wBallMomentumY]
+;	LD b, a
+;	LD a, 1
+;	CP a, b
+;	JP nz, BounceOnTop
+	
+	LD a, [_OAMRAM] ; load paddle y
+	SUB a, 16 + 6 ; 6 to offset the paddle's thickness
+		      ; and the sprite's height
+	LD b, a
+	LD a, [_OAMRAM + 4] ; load ball y
+	SUB a, 16 + 1 ; position ahead of the ball
+	CP a, b
+	JP nz, BounceOnTop
+	; JP SetPaddleJump
+	
 
-    ld a, -1
-    ld [wBallMomentumY], a
-PaddleBounceDone:
+	; ok, don't make a loop, but write each
+	; instruction separately
+	; afterwards make a function or a loop
+	; or both
+	LD a, 7 ; prelare loop to check paddle
+	LD c, a ; width coordinates
+PaddleJump:
+	LD a, [_OAMRAM + 1] ; load paddle x
+	ADD a, c ; going over each position
+	; ADD a, 4 ; offsetting
+	LD b, a
+	LD a, [_OAMRAM + 5] ; load ball x
+	CP a, b
+	JP z, SetPaddleJump ; break loop if collision
+	DEC c
+	LD a, 0
+	CP a, c
+	JP nz, PaddleJump
+	JP BounceOnTop ; if no collision detected
+SetPaddleJump:
+	LD a, -1
+	LD [wBallMomentumY], a
 
 BounceOnTop:
 	LD a, [_OAMRAM + 4]
@@ -171,7 +198,7 @@ BounceOnRight:
 	SUB a, 16
 	LD c, a
 	LD a, [_OAMRAM + 5]
-	SUB a, 8 - 7; -1 to look infront, -6 to look at actual position, otherwise into wall
+	SUB a, 8 - 1
 	LD b, a
 	CALL GetTileByPixel
 	LD a, [hl]
@@ -185,7 +212,7 @@ BounceOnLeft:
 	SUB a, 16
 	LD c, a
 	LD a, [_OAMRAM + 5]
-	SUB a, 8 ; no offset, otherwise bounces 1 pixel in front
+	SUB a, 8 + 1
 	LD b, a
 	CALL GetTileByPixel
 	LD a, [hl]
@@ -204,14 +231,6 @@ BounceOnBottom:
 	CALL GetTileByPixel
 	LD a, [hl]
 	CALL IsWallTile
-	JP nz, CheckBottomPos
-	LD a, -1
-	LD [wBallMomentumY], a
-CheckBottomPos:
-	LD a, [_OAMRAM + 4]
-	LD b, a
-	LD a, $9A
-	CP a, b
 	JP nz, BounceDone
 	LD a, -1
 	LD [wBallMomentumY], a
