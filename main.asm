@@ -1,5 +1,9 @@
 INCLUDE "hardware.inc"
 
+DEF BRICK_LEFT EQU $05
+DEF BRICK_RIGHT EQU $06
+DEF BLANK_TILE EQU $08
+
 SECTION "Header", ROM0[$100]
 
 	JP EntryPoint
@@ -130,26 +134,25 @@ WaitVBlank2:
 	LD [_OAMRAM + 4], a
 
 PaddleBounce:
-    ; First, check if the ball is low enough to bounce off the paddle.
-    ld a, [_OAMRAM]
-    ld b, a
-    ld a, [_OAMRAM + 4]
+	; First, check if the ball is low enough to bounce off the paddle.
+	LD a, [_OAMRAM]
+	LD b, a
+	LD a, [_OAMRAM + 4]
 	ADD a, 5
-    cp a, b
-    jp nz, PaddleBounceDone ; If the ball isn't at the same Y position as the paddle, it can't bounce.
-    ; Now let's compare the X positions of the objects to see if they're touching.
-    ld a, [_OAMRAM + 5] ; Ball's X position.
-    ld b, a
-    ld a, [_OAMRAM + 1] ; Paddle's X position.
-    sub a, 8
-    cp a, b
-    jp nc, PaddleBounceDone
-    add a, 4 + 12 ; 8 to undo, 16 as the width.
-    cp a, b
-    jp c, PaddleBounceDone
-
-    ld a, -1
-    ld [wBallMomentumY], a
+	CP a, b
+	JP nz, PaddleBounceDone ; If the ball isn't at the same Y position as the paddle, it can't bounce.
+	; Now let's compare the X positions of the objects to see if they're touching.
+	LD a, [_OAMRAM + 5] ; Ball's X position.
+	LD b, a
+	LD a, [_OAMRAM + 1] ; Paddle's X position.
+	SUB a, 8
+	CP a, b
+	JP nc, PaddleBounceDone
+	ADD a, 4 + 12 ; 8 to undo, 16 as the width.
+	CP a, b
+	JP c, PaddleBounceDone
+	LD a, -1
+	LD [wBallMomentumY], a
 PaddleBounceDone:
 
 BounceOnTop:
@@ -185,7 +188,7 @@ BounceOnLeft:
 	SUB a, 16
 	LD c, a
 	LD a, [_OAMRAM + 5]
-	SUB a, 8 ; no offset, otherwise bounces 1 pixel in front
+	SUB a, 8 + 1 ; no offset, otherwise bounces 1 pixel in front
 	LD b, a
 	CALL GetTileByPixel
 	LD a, [hl]
@@ -196,25 +199,10 @@ BounceOnLeft:
 
 BounceOnBottom:
 	LD a, [_OAMRAM + 4]
-	SUB a, 16 - 1
-	LD c, a
-	LD a, [_OAMRAM + 5]
-	SUB a, 8
-	LD b, a
-	CALL GetTileByPixel
-	LD a, [hl]
-	CALL IsWallTile
-	JP nz, CheckBottomPos
-	LD a, -1
-	LD [wBallMomentumY], a
-CheckBottomPos:
-	LD a, [_OAMRAM + 4]
-	LD b, a
-	LD a, $9A
-	CP a, b
+	CP $93
 	JP nz, BounceDone
 	LD a, -1
-	LD [wBallMomentumY], a
+	LD [wBallMomentumY], a 
 BounceDone:
 
 	; First, check if left
