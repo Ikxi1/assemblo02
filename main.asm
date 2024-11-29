@@ -166,6 +166,7 @@ BounceOnTop:
 	LD a, [hl]
 	CALL IsWallTile
 	JP nz, BounceOnRight
+	call CheckAndHandleBrick
 	LD a, 1
 	LD [wBallMomentumY], a
 
@@ -180,6 +181,7 @@ BounceOnRight:
 	LD a, [hl]
 	CALL IsWallTile
 	JP nz, BounceOnLeft
+	call CheckAndHandleBrick
 	LD a, -1
 	LD [wBallMomentumX], a
 
@@ -194,9 +196,13 @@ BounceOnLeft:
 	LD a, [hl]
 	CALL IsWallTile
 	JP nz, BounceOnBottom
+	call CheckAndHandleBrick
 	LD a, 1
 	LD [wBallMomentumX], a
 
+	; this will need to be fixed, in case the ball hits
+	; a brick from above, now it will just phase through
+	; and destroy the brick, somehow
 BounceOnBottom:
 	LD a, [_OAMRAM + 4]
 	CP $93
@@ -334,6 +340,25 @@ IsWallTile:
 	CP a, $06
 	RET z
 	CP a, $07
+	RET
+
+; Checks if a brick was collided with and breaks it if possible.
+; @param hl: address of tile.
+CheckAndHandleBrick:
+	LD a, [hl]
+	CP a, BRICK_LEFT
+	JR nz, CheckAndHandleBrickRight
+	; Break a brick from the left side.
+	LD [hl], BLANK_TILE
+	INC hl
+	LD [hl], BLANK_TILE
+CheckAndHandleBrickRight:
+	CP a, BRICK_RIGHT
+	RET nz
+	; Break a brick from the right side.
+	LD [hl], BLANK_TILE
+	DEC hl
+	LD [hl], BLANK_TILE
 	RET
 
 
